@@ -1,0 +1,115 @@
+
+:root {
+  --marron-oscuro: #382e1c;
+  --marron-hover: #59422c;
+  --dorado-suave: #a07b5f;
+  --beige-claro: #fef6e4;
+  --gris-texto: #555;
+  --blanco: #ffffff;
+  --fuente-primaria: "Poppins", sans-serif;
+  --fuente-secundaria: "Georgia", serif;
+}
+
+/* ------------------------------ */
+/* Estilos Globales */
+/* ------------------------------ */
+
+body {
+  font-family: var(--fuente-primaria);
+  background-color: var(--beige-claro);
+  color: var(--marron-oscuro);
+}
+
+h1, h2, h3, .main-title {
+  font-weight: 700;
+  color: var(--marron-oscuro);
+}
+
+.lead {
+  font-size: 1.25rem;
+  line-height: 1.8;
+  margin-bottom: 20px;
+}
+
+.mx-2 {
+  margin: 0 10px;
+}
+
+/* ------------------------------ */
+/* Navbar */
+/* ------------------------------ */
+
+.navbar {
+  background: linear-gradient(135deg, var(--marron-oscuro), var(--dorado-suave));
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand img {
+  max-height: 55px;
+}
+
+.navbar-nav .nav-link {
+  color: #f8f5f0;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+}
+
+.navbar-nav .nav-link:hover {
+  color: var(--dorado-suave);
+}
+
+.navbar .dropdown-toggle {
+  font-weight: 600;
+  color: var(--blanco) !important;
+}
+
+.navbar .dropdown-toggle:hover {
+  color: var(--dorado-suave) !important;
+}
+
+.icono-redondo {
+  width: 50px;
+  height: 70px;
+  border-radius: 50% 50% 60% 60% / 1% 1% 100% 100%; 
+  border: 2px solid var(--marron-oscuro);
+  box-shadow: 0 0 5px rgba(160, 123, 95, 0.5);
+  background: var(--blanco);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Botones */
+.btn-success {
+  background-color: var(--marron-oscuro);
+  border: none;
+  font-weight: 600;
+}
+
+.btn-success:hover {
+  background-color: var(--marron-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-outline-success {
+  border-color: var(--marron-oscuro);
+  color: var(--marron-oscuro);
+}
+
+.btn-outline-success:hover {
+  background-color: var(--marron-oscuro);
+  color: var(--blanco);
+}
+
+.btn-danger {
+  background-color: var(--dorado-suave);
+  border-color: var(--dorado-suave);
+  color: var(--blanco);
+}
+
+.btn-danger:hover {
+  background-color: var(--marron-hover);
+  color: var(--beige-claro);
+}
