@@ -111,7 +111,7 @@ CREATE TABLE ajustes (
 );
 -- Inserta o actualiza
 INSERT INTO ajustes (clave, valor) VALUES
-    ('email_contacto', 'camiloavila905@gmail.com'),
+    ('email_contacto', 'Contacto@gmail.com'),
     ('telefono_contacto', '3142873700'),
     ('direccion_contacto', 'Facatativá – Manzana I lote 1, barrio La Esperanza'),
     ('facebook', ''),
