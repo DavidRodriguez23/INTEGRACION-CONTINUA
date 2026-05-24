@@ -1,10 +1,11 @@
 <?php
+error_reporting(E_ALL & ~E_DEPRECATED & ~E_NOTICE);
 
 //session_start();
 //info base de datos
-define('NOMBRE_SERVIDOR', 'localhost');
-define('NOMBRE_USUARIO', 'root'); //nombre usuario de la base de datos
-define('PASSWORD', '');// password de la base de datos
+define('NOMBRE_SERVIDOR', 'db');
+define('NOMBRE_USUARIO', 'ganandez_user'); //nombre usuario de la base de datos
+define('PASSWORD', 'ganandez_pass');// password de la base de datos
 define('NOMBRE_DB', 'IT');//nombre de la base de datos
 
 //rutas de la web

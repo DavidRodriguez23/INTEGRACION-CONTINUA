@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  web:
+    build: .
+    container_name: ganandez_web
+    ports:
+      - "8080:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - ganandez-net
+
+  db:
+    image: mysql:8.0
+    container_name: ganandez_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: IT
+      MYSQL_USER: ganandez_user
+      MYSQL_PASSWORD: ganandez_pass
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./sql/IT.sql:/docker-entrypoint-initdb.d/IT.sql
+    healthcheck:
+      test: ["CMD","mysqladmin","ping","-h","localhost","-u","root","-proot_password"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ganandez-net
+
+volumes:
+  db_data:
+networks:
+  ganandez-net:
+    driver: bridge
