@@ -1,41 +1,33 @@
 # 🐄 Ganadería Livestock — Integración Continua
-**Politécnico Grancolombiano · Integración Continua**  
+
+**Politécnico Grancolombiano · Énfasis Profesional I**
 Grupo 13 · Profesor: John Olarte
 
 **Integrantes:**
--JUAN GUZMAN PARRA
-- JUAN PABLO PARRA BARÓN
-- DAVID PERALTA ROZO
-- JUAN RAMIREZ VASQUEZ
-- DAVID FRANCISCO RODRIGUEZ VILLEGAS
+- Juan Pablo Parra Barón
+- David Peralta Rozo
+- Juan Ramírez Vásquez
+- David Francisco Rodríguez Villegas
 
 ---
 
 ## 🏗️ Arquitectura de contenedores
-┌─────────────────────────────────────────┐
-│           Red: ganandez-net             │
-│                                         │
-│  ┌──────────────┐  ┌──────────────┐     │
-│  │ ganandez_web │  │  ganandez_db │     │
-│  │ PHP 8.1      │◄─┤  MySQL 8.0   │     │
-│  │ Apache       │  │  Puerto 3306 │     │
-│  │ Puerto 8080  │  └──────────────┘     │
-│  └──────────────┘                       │
-│                                         │
-│  ┌──────────────────┐                   │
-│  │ ganandez_jenkins │                   │
-│  │ Jenkins LTS      │                   │
-│  │ Puerto 8081      │                   │
-│  └──────────────────┘                   │
-└─────────────────────────────────────────┘
+
+La aplicación corre en tres contenedores Docker conectados mediante la red bridge `ganandez-net`:
+
+| Contenedor | Imagen | Puerto | Rol |
+|---|---|---|---|
+| `ganandez_web` | PHP 8.1 + Apache | 8080 | Aplicación web |
+| `ganandez_db` | MySQL 8.0 | 3306 (interno) | Base de datos |
+| `ganandez_jenkins` | Jenkins LTS | 8081 | Servidor CI |
+
+> `ganandez_web` depende de `ganandez_db` y espera a que esté saludable antes de iniciar.
+
+---
 
 ## 🚀 Instrucciones para ejecutar
 
-### Requisitos
-- Docker Desktop instalado
-- Git
-
-### Pasos
+**Requisitos:** Docker Desktop y Git instalados.
 
 ```bash
 # 1. Clonar el repositorio
@@ -59,12 +51,16 @@ docker ps
 ---
 
 ## 📦 Entrega 1 — Docker (Semana 3)
+
 Dos contenedores comunicados entre sí mediante red bridge `ganandez-net`:
-- `ganandez_web`: PHP 8.1 + Apache, sirve la aplicación Ganadería Livestock
-- `ganandez_db`: MySQL 8.0, base de datos inicializada automáticamente con `sql/IT.sql`
+
+- **`ganandez_web`**: PHP 8.1 + Apache, sirve la aplicación Ganadería Livestock
+- **`ganandez_db`**: MySQL 8.0, base de datos inicializada automáticamente con `sql/IT.sql`
 
 ## ⚙️ Entrega 2 — Jenkins (Semana 5)
-Tercer contenedor `ganandez_jenkins` agregado a la misma red. Pipeline CI definido en `Jenkinsfile` con las etapas:
+
+Tercer contenedor `ganandez_jenkins` agregado a la misma red. Pipeline CI definido en `Jenkinsfile` con las siguientes etapas:
+
 1. Clonar repositorio
 2. Verificar archivos
 3. Construir contenedor web
