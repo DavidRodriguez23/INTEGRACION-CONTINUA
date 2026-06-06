@@ -1,7 +1,7 @@
 <?php
 error_reporting(E_ALL & ~E_DEPRECATED & ~E_NOTICE);
 
-//session_start();
+session_start();
 //info base de datos
 define('NOMBRE_SERVIDOR', 'db');
 define('NOMBRE_USUARIO', 'ganandez_user'); //nombre usuario de la base de datos
@@ -10,7 +10,7 @@ define('NOMBRE_DB', 'IT');//nombre de la base de datos
 
 //rutas de la web
 
-define("SERVIDOR", "http://localhost/INTEGRACION-CONTINUA"); 
+define("SERVIDOR", "http://localhost:8080"); 
 define("RUTA_REGISTRO", SERVIDOR. "/registro");
 define("RUTA_REGISTRO_CORRECTO", SERVIDOR. "/registro-correcto");
 define("RUTA_LOGIN", SERVIDOR. "/login");
