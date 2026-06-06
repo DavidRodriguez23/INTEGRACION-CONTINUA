@@ -8,33 +8,13 @@ include_once 'app/EscritorAnimal.inc.php';
 include_once 'plantillas/documento-apertura.inc.php';
 include_once 'plantillas/navbar.inc.php';
 
-
-
 if (!isset($animal) || !$animal instanceof Animal) {
-    echo "<div class='alert alert-danger text-center'>No se encontró la publicación.</div>";
+    echo "<div class='alert alert-danger text-center m-5'>No se encontro la publicacion.</div>";
     include_once 'plantillas/documento-cierre.inc.php';
     return;
 }
 
-function ruta_web($ruta_absoluta)
-{
-    $ruta_absoluta = str_replace('\\', '/', $ruta_absoluta);
-    $pos = strpos($ruta_absoluta, '/usuarios/');
-    if ($pos === false) {
-        $pos = strpos($ruta_absoluta, 'usuarios/');
-    }
-    return $pos !== false ? '/' . ltrim(substr($ruta_absoluta, $pos), '/') : $ruta_absoluta;
-}
-
-function obtener_mime_video($ext)
-{
-    $ext = strtolower($ext);
-    $mimes = ['mp4' => 'video/mp4', 'webm' => 'video/webm', 'ogg' => 'video/ogg'];
-    return $mimes[$ext] ?? 'video/mp4';
-}
-
-function json_decode_recursivo($json, $depth = 3)
-{
+function json_decode_recursivo($json, $depth = 3) {
     $decoded = $json;
     while (is_string($decoded) && $depth-- > 0) {
         $decoded = json_decode($decoded, true);
@@ -43,336 +23,195 @@ function json_decode_recursivo($json, $depth = 3)
 }
 
 $imagenes_raw = json_decode_recursivo($animal->obtener_imagenes()) ?? [];
-$videos_raw = json_decode_recursivo($animal->obtener_videos()) ?? [];
-
 $imagenes = [];
-$videos = [];
-
-foreach ($imagenes_raw as $media_url) {
-    $ext = strtolower(pathinfo($media_url, PATHINFO_EXTENSION));
-    if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
-        $imagenes[] = $media_url;
-    } elseif (in_array($ext, ['mp4', 'webm', 'ogg'])) {
-        $videos[] = $media_url;
-    }
+foreach ((array)$imagenes_raw as $url) {
+    $ext = strtolower(pathinfo($url, PATHINFO_EXTENSION));
+    if (in_array($ext, ['jpg','jpeg','png','gif','webp'])) $imagenes[] = $url;
 }
 
-foreach ($videos_raw as $media_url) {
-    if (!in_array($media_url, $videos)) {
-        $videos[] = $media_url;
-    }
-}
-
-$precio_formateado = number_format($animal->obtener_precio(), 0, ',', '.') . ' COP';
-
-// Obtener latitud y longitud del animal
-$latitud = $animal->obtener_latitud();
+$precio_formateado = '$ ' . number_format($animal->obtener_precio(), 0, ',', '.');
+$latitud  = $animal->obtener_latitud();
 $longitud = $animal->obtener_longitud();
-?>
-<br><br>
-<div class="container my-5">
-    <div class="row">
-        <!-- Contenido principal -->
-        <div class="col-lg-8 animate-fade-in">
-            <div class="card tarjeta-animal p-4">
-                <div class="row g-0">
-                    <!-- Quitar la vista de imágenes y videos, solo deja el ícono representativo -->
-                    <div class="col-md-5 mb-4">
-                        <div class="d-flex align-items-center justify-content-center bg-light rounded" style="height: 400px; min-height: 360px; max-height: 480px;">
-                            <?php if ($animal instanceof Caballo): ?>
-                                <i class="fas fa-horse fa-8x text-primary"></i>
-                            <?php else: ?>
-                                <i class="fas fa-cow fa-8x text-success"></i>
-                            <?php endif; ?>
-                        </div>
-                    </div>
+$tiene_mapa = !empty($latitud) && !empty($longitud);
 
-                    <div class="col-md-7 d-flex flex-column justify-content-between ps-md-4">
-                        <h2 class="main-title text-center mb-4"><?= htmlspecialchars($animal->obtener_titulo()) ?></h2>
-
-                        <div class="precio-animal precio-vista-animal">
-                            <i class="bi bi-currency-dollar me-3"></i><strong><?= $precio_formateado ?></strong>
-                        </div>
-                        <!-- Botón agregar al carrito -->
-                        <?php
-                        $carrito = $_SESSION['carrito'] ?? [];
-                        $tipo_item = ($animal instanceof Caballo) ? 'caballo' : 'animal';
-                        $id_item = $animal->obtener_id();
-                        if (empty($id_item)) {
-                            echo '<div class="alert alert-danger">Error: ID de animal/caballo no válido.</div>';
-                        } else {
-                        $en_carrito = isset($carrito[$tipo_item . '_' . $id_item]);
-                        ?>
-                        <form method="post" action="<?php echo RUTA_CARRITO; ?>" class="mb-3">
-                            <input type="hidden" name="tipo" value="<?= $tipo_item ?>">
-                            <input type="hidden" name="id" value="<?= $id_item ?>">
-                            <?php if ($en_carrito): ?>
-                                <button type="submit" name="quitar" class="btn btn-warning w-100 my-2">
-                                    <i class="fas fa-shopping-cart"></i> Quitar del carrito
-                                </button>
-                            <?php else: ?>
-                                <button type="submit" name="agregar" class="btn btn-success w-100 my-2">
-                                    <i class="fas fa-cart-plus"></i> Agregar al carrito de compras
-                                </button>
-                            <?php endif; ?>
-                        </form>
-                        <?php } ?>
-
-                        <!-- Sección Descripción -->
-                        <?php if ($animal->obtener_descripcion()): ?>
-                            <section class="mb-5">
-                                <h4 class="section-title">
-                                    <i class="bi bi-card-text me-3"></i>Descripción
-                                </h4>
-                                <p class="section-content"><?= nl2br(htmlspecialchars($animal->obtener_descripcion())) ?></p>
-                                <hr>
-                            </section>
-                        <?php endif; ?>
-
-                        <!-- Sección Datos adicionales -->
-                        <section class="mb-5">
-                            <h4 class="section-title mb-4">
-                                <i class="bi bi-info-circle-fill me-3"></i>Detalles
-                            </h4>
-                            <ul class="list-group list-group-flush fs-4">
-                                <li class="list-group-item">
-                                    <i class="bi bi-tags-fill me-3 text-success"></i><strong>Categoría:</strong> <?= htmlspecialchars($animal->obtener_categoria()) ?>
-                                </li>
-                                <li class="list-group-item">
-                                    <i class="bi bi-award-fill me-3 text-warning"></i><strong>Raza:</strong> <?= htmlspecialchars($animal->obtener_raza()) ?>
-                                </li>
-                                <li class="list-group-item">
-                                    <i class="bi bi-patch-check-fill me-3 text-primary"></i><strong>Pureza:</strong> <?= htmlspecialchars($animal->obtener_pureza()) ?>
-                                </li>
-                                <li class="list-group-item">
-                                    <i class="bi bi-gender-ambiguous me-3 text-danger"></i><strong>Sexo:</strong> <?= htmlspecialchars($animal->obtener_sexo()) ?>
-                                </li>
-                                <li class="list-group-item">
-                                    <i class="bi bi-hourglass-split me-3 text-info"></i><strong>Edad:</strong> <?= htmlspecialchars($animal->obtener_edad()) ?>
-                                </li>
-                                <li class="list-group-item">
-                                    <i class="bi bi-bar-chart-fill me-3 text-secondary"></i><strong>Peso:</strong> <?= htmlspecialchars($animal->obtener_peso()) ?> kg
-                                </li>
-                            </ul>
-                        </section>
-                        <hr>
-                        <!-- Sección Ubicación y Contacto -->
-                        <section>
-                            <h4 class="section-title mb-4">
-                                <i class="bi bi-geo-alt-fill me-3"></i>Ubicación & Contacto
-                            </h4>
-                            <p class="section-content fs-5 mb-3">
-                                <i class="bi bi-flag-fill me-2" title="Departamento"></i> <?= htmlspecialchars($animal->obtener_departamento()) ?><br>
-                                <i class="bi bi-building me-2" title="Municipio"></i> <?= htmlspecialchars($animal->obtener_municipio()) ?><br>
-                                <i class="bi bi-geo me-2" title="Dirección"></i> <?= htmlspecialchars($animal->obtener_direccion()) ?>
-                            </p>
-                            <p class="section-content fs-5">
-                                <i class="bi bi-telephone-fill me-2 text-success"></i><strong>Teléfono:</strong> <?= htmlspecialchars($animal->obtener_telefono()) ?><br>
-                                <i class="bi bi-envelope-fill me-2 text-primary"></i><strong>Correo:</strong> <?= htmlspecialchars($animal->obtener_correo()) ?>
-                            </p>
-                        </section>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Otras publicaciones -->
-        <div class="col-lg-4">
-            <div class="seccion-explora text-center p-4">
-                <h2 class="text-center mb-4 text-dark titulo-otras-publicaciones">
-                    <i class="fas fa-layer-group me-2 text-warning"></i>Otras Publicaciones
-                </h2>
-                <h3 class="mb-4 text-muted small">
-                    Descubre más animales publicados recientemente que podrían interesarte. ¡Explora y encuentra el ejemplar ideal para ti!
-                </h3>
-                <?php
-                Conexion::abrir_conexion();
-                RepositorioAnimal::eliminar_anuncios_vencidos(Conexion::obtener_conexion());
-                RepositorioCaballo::eliminar_anuncios_vencidos(Conexion::obtener_conexion());
-
-                // 1. Obtener publicaciones por grupo
-                $grupos = [
-                    array_merge(
-                        RepositorioCaballo::obtener_caballos_sugeridos(Conexion::obtener_conexion()),
-                        RepositorioAnimal::obtener_animal_sugerido(Conexion::obtener_conexion())
-                    ),
-                    array_merge(
-                        RepositorioCaballo::obtener_caballos_premium(Conexion::obtener_conexion()),
-                        RepositorioAnimal::obtener_animal_premium(Conexion::obtener_conexion())
-                    ),
-                    array_merge(
-                        RepositorioCaballo::obtener_caballos_destacados(Conexion::obtener_conexion()),
-                        RepositorioAnimal::obtener_animal_destacado(Conexion::obtener_conexion())
-                    ),
-                    array_merge(
-                        RepositorioCaballo::obtener_caballos_normales(Conexion::obtener_conexion()),
-                        RepositorioAnimal::obtener_animales_normales(Conexion::obtener_conexion())
-                    )
-                ];
-
-
-                // 2. Inicializar variables
-                $ids_vistos = [$animal->obtener_id()];
-                $sugerencias = [];
-
-                // 3. Procesar grupos en orden, mezclando y acumulando hasta 3 sugerencias únicas
-                foreach ($grupos as $grupo) {
-                    shuffle($grupo);
-                    foreach ($grupo as $item) {
-                        if ($item && !in_array($item->obtener_id(), $ids_vistos)) {
-                            $sugerencias[] = $item;
-                            $ids_vistos[] = $item->obtener_id();
-                        }
-                        if (count($sugerencias) >= 3) break 2; // Salir de ambos bucles
-                    }
-                }
-                $cuantas = count($sugerencias);
-
-                if ($cuantas === 1) {
-                    echo "<div class='alert alert-warning small'>Solo encontramos una publicación relacionada en este momento.</div>";
-                } elseif ($cuantas === 2) {
-                    echo "<div class='alert alert-warning small'>Hemos encontrado dos publicaciones que podrían interesarte.</div>";
-                }
-
-                // 4. Mostrar sugerencias
-                if (!empty($sugerencias)) {
-                    // Filtrar sugerencias para excluir animales/caballos vendidos
-                    $sugerencias = array_filter($sugerencias, function ($item) {
-                        return method_exists($item, 'esta_vendido') ? !$item->esta_vendido() : true;
-                    });
-
-                    if (!empty($sugerencias)) {
-                        $contador = 0;
-                        foreach ($sugerencias as $sug) {
-                            if ($contador == 0) {
-                                EscritorAnimal::escribir_tarjeta_animal($sug, false);
-                            } else {
-                                echo '<div class="mt-4">';
-                                EscritorAnimal::escribir_tarjeta_animal($sug, false);
-                                echo '</div>';
-                            }
-                            $contador++;
-                        }
-                    } else {
-                        echo "<div class='alert alert-info'>No hay otras publicaciones disponibles que no estén vendidas.</div>";
-                    }
-                } else {
-                    echo "<div class='alert alert-info'>No hay otras publicaciones para mostrar.</div>";
-                }
-
-                ?>
-
-
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Modal para mostrar imagen completa con navegación -->
-<div class="modal fade" id="modalImagenCompleta" tabindex="-1" aria-labelledby="modalImagenCompletaLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-fullscreen">
-        <div class="modal-content bg-dark border-0 position-relative">
-
-            <!-- Botón cerrar -->
-            <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-4 fs-2 z-3" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-
-            <!-- Flechas navegación -->
-            <button id="prevImagenModal" class="btn btn-light position-absolute start-0 top-50 translate-middle-y z-3" style="font-size: 2rem;">
-                <i class="bi bi-chevron-left"></i>
-            </button>
-            <button id="nextImagenModal" class="btn btn-light position-absolute end-0 top-50 translate-middle-y z-3" style="font-size: 2rem;">
-                <i class="bi bi-chevron-right"></i>
-            </button>
-
-            <!-- Imagen en grande -->
-            <div class="modal-body p-0 d-flex justify-content-center align-items-center overflow-auto">
-                <img src="" id="imagenCompletaModal" class="rounded shadow-lg"
-                    style="width: auto; height: auto; min-width: 40%; min-height: 40%; max-width: none; max-height: none; object-fit: contain; background-color: #fff;"
-                    alt="Imagen completa">
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    const imagenes = Array.from(document.querySelectorAll('.img-lupa'));
-    const modalImg = document.getElementById('imagenCompletaModal');
-    const modal = document.getElementById('modalImagenCompleta');
-
-    let currentIndex = 0;
-
-    // Función para mostrar imagen según el índice
-    function mostrarImagen(index) {
-        if (index < 0) {
-            index = imagenes.length - 1;
-        } else if (index >= imagenes.length) {
-            index = 0;
-        }
-
-        currentIndex = index;
-        const nuevaImg = imagenes[currentIndex];
-        modalImg.src = nuevaImg.getAttribute('data-img');
+$carrito = $_SESSION['carrito'] ?? [];
+$en_carrito = false;
+foreach ($carrito as $item) {
+    if (isset($item['id']) && $item['id'] == $animal->obtener_id() && isset($item['tipo']) && $item['tipo'] === 'animal') {
+        $en_carrito = true; break;
     }
+}
+?>
 
-    // Evento click en cada imagen del carrusel
-    imagenes.forEach((img, index) => {
-        img.addEventListener('click', () => {
-            currentIndex = index;
-            mostrarImagen(currentIndex);
-        });
-    });
+<div style="margin-top:70px;"></div>
 
-    // Botones de navegación
-    document.getElementById('prevImagenModal').addEventListener('click', (e) => {
-        e.stopPropagation(); // Evita conflictos con otros clics
-        mostrarImagen(currentIndex - 1);
-    });
+<div class="container" style="padding:40px 0 60px;">
 
-    document.getElementById('nextImagenModal').addEventListener('click', (e) => {
-        e.stopPropagation();
-        mostrarImagen(currentIndex + 1);
-    });
+  <!-- Breadcrumb -->
+  <nav style="margin-bottom:24px;">
+    <span style="font-size:0.85rem;color:var(--tierra-mid);">
+      <a href="<?= SERVIDOR ?>" style="color:var(--tierra-mid);">Inicio</a>
+      <span style="margin:0 8px;">›</span>
+      <a href="<?= RUTA_COMPRA ?>" style="color:var(--tierra-mid);">Comprar</a>
+      <span style="margin:0 8px;">›</span>
+      <span style="color:var(--tierra);"><?= htmlspecialchars($animal->obtener_titulo()) ?></span>
+    </span>
+  </nav>
 
-    // Flechas del teclado
-    document.addEventListener('keydown', function(e) {
-        if (!modal.classList.contains('show')) return;
-        if (e.key === 'ArrowLeft') {
-            mostrarImagen(currentIndex - 1);
-        } else if (e.key === 'ArrowRight') {
-            mostrarImagen(currentIndex + 1);
-        }
-    });
-</script>
+  <div class="row g-4">
 
-<!-- Sección del mapa de ubicación individual -->
-<?php if ($latitud && $longitud): ?>
-    <div class="container my-5">
-        <h4 class="mb-3 text-success"><i class="fas fa-map-marker-alt me-2"></i>Ubicación en el mapa</h4>
-        <div id="mapa-ubicacion-animal" style="height: 400px;" class="rounded shadow"></div>
-    </div>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            var mapaAnimal = L.map('mapa-ubicacion-animal').setView([<?= $latitud ?>, <?= $longitud ?>], 13); // Zoom ampliado
+    <!-- COLUMNA IZQUIERDA: Imagen + mapa -->
+    <div class="col-lg-7">
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap'
-            }).addTo(mapaAnimal);
+      <!-- Imagen principal -->
+      <div style="background:var(--crema-mid);border-radius:var(--radio-lg);overflow:hidden;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;border:1px solid rgba(61,43,31,0.1);">
+        <?php if (!empty($imagenes)): ?>
+          <img src="<?= htmlspecialchars($imagenes[0]) ?>" alt="<?= htmlspecialchars($animal->obtener_titulo()) ?>"
+               style="width:100%;height:100%;object-fit:cover;">
+        <?php else: ?>
+          <div style="text-align:center;color:var(--tierra-mid);">
+            <i class="fas fa-cow" style="font-size:5rem;margin-bottom:12px;display:block;color:var(--tierra-light);"></i>
+            <span style="font-size:0.9rem;">Sin imagen disponible</span>
+          </div>
+        <?php endif; ?>
+      </div>
 
-            var iconoGanandez = L.icon({
-                iconUrl: '<?= SERVIDOR . "/img/Logo-ganandez.jpg"; ?>',
-                iconSize: [50, 50],
-                iconAnchor: [25, 40],
-                popupAnchor: [0, -70],
-                className: 'icono-redondo'
+      <!-- Galería adicional -->
+      <?php if (count($imagenes) > 1): ?>
+        <div style="display:flex;gap:8px;margin-top:10px;overflow-x:auto;">
+          <?php foreach (array_slice($imagenes, 1) as $img): ?>
+            <img src="<?= htmlspecialchars($img) ?>" style="width:80px;height:60px;object-fit:cover;border-radius:6px;border:2px solid var(--crema-dark);cursor:pointer;flex-shrink:0;">
+          <?php endforeach; ?>
+        </div>
+      <?php endif; ?>
+
+      <!-- Mapa -->
+      <?php if ($tiene_mapa): ?>
+        <div style="margin-top:24px;">
+          <h5 style="font-family:var(--fuente-titulo);color:var(--tierra);margin-bottom:12px;">
+            <i class="fas fa-map-marker-alt me-2" style="color:var(--dorado);"></i>Ubicación
+          </h5>
+          <div id="mapa-animal" style="height:260px;border-radius:var(--radio-lg);border:1px solid rgba(61,43,31,0.12);"></div>
+          <script>
+            document.addEventListener('DOMContentLoaded', function() {
+              var mapa = L.map('mapa-animal').setView([<?= $latitud ?>, <?= $longitud ?>], 12);
+              L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution:'&copy; OpenStreetMap'}).addTo(mapa);
+              L.marker([<?= $latitud ?>, <?= $longitud ?>]).addTo(mapa)
+                .bindPopup('<strong><?= htmlspecialchars($animal->obtener_titulo()) ?></strong><br><?= htmlspecialchars($animal->obtener_municipio() . ', ' . $animal->obtener_departamento()) ?>').openPopup();
             });
+          </script>
+        </div>
+      <?php endif; ?>
+    </div>
 
-            L.marker([<?= $latitud ?>, <?= $longitud ?>], {
-                    icon: iconoGanandez
-                })
-                .addTo(mapaAnimal)
-                .bindPopup(`<strong><?= htmlspecialchars($animal->obtener_titulo()) ?></strong>`)
-                .openPopup();
-        });
-    </script>
-<?php endif; ?>
+    <!-- COLUMNA DERECHA: Info + acciones -->
+    <div class="col-lg-5">
+      <div style="position:sticky;top:84px;">
+
+        <!-- Badges -->
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+          <span style="background:var(--dorado-pale);color:var(--dorado);font-size:0.72rem;font-weight:500;padding:4px 12px;border-radius:20px;letter-spacing:0.05em;text-transform:uppercase;">
+            <?= htmlspecialchars($animal->obtener_categoria()) ?>
+          </span>
+          <span style="background:rgba(45,80,22,0.1);color:var(--verde);font-size:0.72rem;font-weight:500;padding:4px 12px;border-radius:20px;letter-spacing:0.05em;text-transform:uppercase;">
+            <?= htmlspecialchars($animal->obtener_raza()) ?>
+          </span>
+          <?php if ($animal->obtener_premium()): ?>
+            <span style="background:var(--tierra);color:#fff;font-size:0.72rem;font-weight:500;padding:4px 12px;border-radius:20px;">
+              ⭐ Premium
+            </span>
+          <?php endif; ?>
+        </div>
+
+        <!-- Título -->
+        <h1 style="font-family:var(--fuente-titulo);font-size:clamp(1.4rem,2.5vw,2rem);font-weight:700;color:var(--tierra);line-height:1.2;margin-bottom:16px;">
+          <?= htmlspecialchars($animal->obtener_titulo()) ?>
+        </h1>
+
+        <!-- Precio -->
+        <div style="background:var(--crema-mid);border-radius:var(--radio-lg);padding:16px 20px;margin-bottom:20px;border-left:4px solid var(--dorado);">
+          <div style="font-size:0.75rem;color:var(--tierra-mid);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Precio</div>
+          <div style="font-family:var(--fuente-titulo);font-size:2rem;font-weight:700;color:var(--verde);"><?= $precio_formateado ?></div>
+          <?php if ($animal->obtener_tipo_precio()): ?>
+            <div style="font-size:0.8rem;color:var(--tierra-mid);">por <?= htmlspecialchars($animal->obtener_tipo_precio()) ?></div>
+          <?php endif; ?>
+        </div>
+
+        <!-- Detalles -->
+        <div style="background:#fff;border:1px solid rgba(61,43,31,0.1);border-radius:var(--radio-lg);padding:16px 20px;margin-bottom:20px;">
+          <h6 style="font-family:var(--fuente-titulo);color:var(--tierra);margin-bottom:12px;font-size:0.95rem;">Características</h6>
+          <table style="width:100%;font-size:0.88rem;">
+            <?php
+            $detalles = [
+              ['fas fa-paw',           'Raza',         $animal->obtener_raza()],
+              ['fas fa-venus-mars',    'Sexo',         $animal->obtener_sexo()],
+              ['fas fa-birthday-cake', 'Edad',         $animal->obtener_edad()],
+              ['fas fa-weight',        'Peso',         $animal->obtener_peso() ? $animal->obtener_peso() . ' kg' : null],
+              ['fas fa-dna',           'Pureza',       method_exists($animal,'obtener_pureza') ? $animal->obtener_pureza() : null],
+              ['fas fa-map-marker-alt','Departamento', $animal->obtener_departamento()],
+              ['fas fa-city',          'Municipio',    $animal->obtener_municipio()],
+            ];
+            foreach ($detalles as $d):
+              if (!$d[2]) continue;
+            ?>
+              <tr style="border-bottom:1px solid rgba(61,43,31,0.06);">
+                <td style="padding:7px 0;color:var(--tierra-mid);width:40%;">
+                  <i class="<?= $d[0] ?> me-2" style="color:var(--dorado);width:16px;text-align:center;"></i><?= $d[1] ?>
+                </td>
+                <td style="padding:7px 0;color:var(--tierra);font-weight:500;"><?= htmlspecialchars($d[2]) ?></td>
+              </tr>
+            <?php endforeach; ?>
+          </table>
+        </div>
+
+        <!-- Descripción -->
+        <?php if ($animal->obtener_descripcion()): ?>
+          <div style="background:#fff;border:1px solid rgba(61,43,31,0.1);border-radius:var(--radio-lg);padding:16px 20px;margin-bottom:20px;">
+            <h6 style="font-family:var(--fuente-titulo);color:var(--tierra);margin-bottom:8px;font-size:0.95rem;">Descripción</h6>
+            <p style="font-size:0.9rem;color:var(--tierra-mid);line-height:1.7;margin:0;"><?= nl2br(htmlspecialchars($animal->obtener_descripcion())) ?></p>
+          </div>
+        <?php endif; ?>
+
+        <!-- Contacto -->
+        <div style="background:var(--crema-mid);border-radius:var(--radio-lg);padding:16px 20px;margin-bottom:20px;">
+          <h6 style="font-family:var(--fuente-titulo);color:var(--tierra);margin-bottom:10px;font-size:0.95rem;">Contactar vendedor</h6>
+          <?php if ($animal->obtener_telefono()): ?>
+            <a href="https://wa.me/57<?= preg_replace('/[^0-9]/','',$animal->obtener_telefono()) ?>?text=Hola, me interesa: <?= urlencode($animal->obtener_titulo()) ?>"
+               target="_blank"
+               style="display:flex;align-items:center;gap:10px;background:#25D366;color:#fff;padding:10px 16px;border-radius:6px;text-decoration:none;font-weight:500;font-size:0.9rem;margin-bottom:8px;">
+              <i class="fab fa-whatsapp" style="font-size:1.2rem;"></i>
+              Contactar por WhatsApp
+            </a>
+          <?php endif; ?>
+          <?php if ($animal->obtener_correo()): ?>
+            <a href="mailto:<?= htmlspecialchars($animal->obtener_correo()) ?>?subject=Consulta sobre: <?= urlencode($animal->obtener_titulo()) ?>"
+               style="display:flex;align-items:center;gap:10px;background:var(--tierra);color:#fff;padding:10px 16px;border-radius:6px;text-decoration:none;font-weight:500;font-size:0.9rem;">
+              <i class="fas fa-envelope" style="font-size:1rem;"></i>
+              Enviar correo
+            </a>
+          <?php endif; ?>
+        </div>
+
+        <!-- Botón carrito -->
+        <?php if (!$animal->esta_vendido()): ?>
+          <form method="post" action="<?= SERVIDOR ?>/vistas/carrito.php">
+            <input type="hidden" name="id" value="<?= $animal->obtener_id() ?>">
+            <input type="hidden" name="tipo" value="animal">
+            <input type="hidden" name="accion" value="<?= $en_carrito ? 'eliminar' : 'agregar' ?>">
+            <button type="submit" class="btn btn-lg w-100" style="<?= $en_carrito ? 'background:var(--tierra-mid);' : 'background:var(--dorado);' ?> color:<?= $en_carrito ? '#fff' : 'var(--tierra)' ?>;border:none;font-weight:600;padding:14px;">
+              <i class="fas <?= $en_carrito ? 'fa-cart-arrow-down' : 'fa-cart-plus' ?> me-2"></i>
+              <?= $en_carrito ? 'Quitar del carrito' : 'Agregar al carrito' ?>
+            </button>
+          </form>
+        <?php else: ?>
+          <div style="background:var(--crema-dark);text-align:center;padding:14px;border-radius:var(--radio-lg);color:var(--tierra-mid);font-weight:500;">
+            <i class="fas fa-check-circle me-2" style="color:var(--verde);"></i>Este animal ya fue vendido
+          </div>
+        <?php endif; ?>
+
+      </div>
+    </div>
+  </div>
+</div>
 
 <?php include_once 'plantillas/documento-cierre.inc.php'; ?>
