@@ -1,5 +1,5 @@
 <?php
-include_once 'app/usuario.inc.php';
+include_once 'app/Usuario.inc.php';
 
 class RepositorioUsuario
 {
