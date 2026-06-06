@@ -6,7 +6,7 @@ include_once 'app/Redireccion.inc.php';
 
 include_once 'app/EscritorAnimal.inc.php';
 
-include_once 'app/usuario.inc.php';
+include_once 'app/Usuario.inc.php';
 include_once 'app/Animal.inc.php';
 include_once 'app/Caballo.inc.php';
 
