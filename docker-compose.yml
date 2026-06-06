@@ -1,5 +1,7 @@
 version: '3.8'
+
 services:
+
   web:
     build: .
     container_name: ganandez_web
@@ -30,8 +32,21 @@ services:
     networks:
       - ganandez-net
 
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: ganandez_jenkins
+    ports:
+      - "8081:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_data:/var/jenkins_home
+    networks:
+      - ganandez-net
+
 volumes:
   db_data:
+  jenkins_data:
+
 networks:
   ganandez-net:
     driver: bridge
