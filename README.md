@@ -4,10 +4,12 @@
 Grupo 13 · Profesor: John Olarte
 
 **Integrantes:**
-- Juan Pablo Parra Barón
-- David Peralta Rozo
-- Juan Ramírez Vásquez
-- David Francisco Rodríguez Villegas
+- JUAN GUZMAN PARRA
+- JUAN PABLO PARRA BARÓN
+- DAVID PERALTA ROZO
+- JUAN RAMIREZ VASQUEZ
+- DAVID FRANCISCO RODRIGUEZ VILLEGAS
+
 
 ---
 
