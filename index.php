@@ -24,7 +24,7 @@ $partes_ruta = array_filter($partes_ruta);
 $partes_ruta = array_slice($partes_ruta, 0);
 
 $ruta_elegida = 'vistas/404.php';
-if (isset($partes_ruta[0])) { //DOMINIO SE ENCUENTRA EL PROYECTO
+if (true) { //DOMINIO SE ENCUENTRA EL PROYECTO
     if (count($partes_ruta) == 0 || count($partes_ruta) == 1) {
         $ruta_elegida = 'vistas/home.php';
     } elseif (count($partes_ruta) == 2) {
