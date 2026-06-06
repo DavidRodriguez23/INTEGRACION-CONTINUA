@@ -16,7 +16,7 @@ $deshabilitar_botones = $sesion_iniciada && !$usuario_activo;
     <div class="row justify-content-center text-center">
       <div class="col-12 col-lg-7">
 
-        <div class="hero-tag">🐄 Colombia's #1 Livestock Marketplace</div>
+        <div class="hero-tag">🐄 Portal número 1 en Colombia para compra/venta de ganado</div>
 
         <h1 style="font-family:'Playfair Display',Georgia,serif;font-size:clamp(1.8rem,3.2vw,2.8rem);font-weight:700;color:#fff;line-height:1.2;margin-bottom:16px;">
           Compra y vende <span style="color:#E8B84B;">ganado de calidad</span>
