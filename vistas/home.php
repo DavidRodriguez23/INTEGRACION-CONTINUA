@@ -11,16 +11,18 @@ $sesion_iniciada = ControlSesion::sesion_iniciada();
 $deshabilitar_botones = $sesion_iniciada && !$usuario_activo;
 ?>
 
-<!-- HERO SECTION -->
 <section class="hero-principal">
   <div class="container">
-    <div class="row align-items-center">
-      <div class="col-lg-8">
+    <div class="row justify-content-center text-center">
+      <div class="col-12 col-lg-7">
+
         <div class="hero-tag">🐄 Colombia's #1 Livestock Marketplace</div>
-        <h1 class="hero-principal h1">
-          Compra y vende<br><span class="acento">ganado de calidad</span>
+
+        <h1 style="font-family:'Playfair Display',Georgia,serif;font-size:clamp(1.8rem,3.2vw,2.8rem);font-weight:700;color:#fff;line-height:1.2;margin-bottom:16px;">
+          Compra y vende <span style="color:#E8B84B;">ganado de calidad</span>
         </h1>
-        <p class="hero-desc">
+
+        <p style="color:rgba(255,255,255,0.65);font-size:1rem;max-width:480px;margin:0 auto 28px;line-height:1.7;">
           En Ganadería Livestock conectamos compradores y vendedores de ganado y caballos en toda Colombia. Rápido, seguro y confiable.
         </p>
 
@@ -31,61 +33,48 @@ $deshabilitar_botones = $sesion_iniciada && !$usuario_activo;
           </div>
         <?php endif; ?>
 
-        <div class="hero-btns d-flex gap-3 flex-wrap">
+        <div class="d-flex gap-3 flex-wrap justify-content-center mb-5">
           <a href="<?php echo RUTA_COMPRA; ?>" class="btn btn-dorado btn-lg px-4">
             <i class="fas fa-search me-2"></i>Ver publicaciones
           </a>
           <?php if ($sesion_iniciada && $usuario_activo): ?>
-            <a href="<?php echo RUTA_VENTA; ?>" class="btn btn-outline-dorado btn-lg px-4" style="border:1.5px solid rgba(232,184,75,0.6);color:#fff;">
+            <a href="<?php echo RUTA_VENTA; ?>" class="btn btn-lg px-4" style="border:1.5px solid rgba(232,184,75,0.5);color:#fff;background:transparent;">
               <i class="fas fa-bullhorn me-2"></i>Publicar anuncio
             </a>
           <?php elseif (!$sesion_iniciada): ?>
-            <a href="<?php echo RUTA_REGISTRO; ?>" class="btn btn-outline-dorado btn-lg px-4" style="border:1.5px solid rgba(232,184,75,0.6);color:#fff;">
+            <a href="<?php echo RUTA_REGISTRO; ?>" class="btn btn-lg px-4" style="border:1.5px solid rgba(232,184,75,0.5);color:#fff;background:transparent;">
               <i class="fas fa-user-plus me-2"></i>Crear cuenta gratis
             </a>
           <?php endif; ?>
         </div>
 
-        <div class="hero-stats">
-          <div class="hero-stat">
-            <span class="hero-stat-num">12K+</span>
-            <span class="hero-stat-label">Compradores activos</span>
+        <div class="d-flex justify-content-center gap-0" style="border-top:1px solid rgba(255,255,255,0.12);padding-top:24px;">
+          <div style="padding:0 28px;border-right:1px solid rgba(255,255,255,0.12);">
+            <span style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:#E8B84B;display:block;line-height:1;margin-bottom:4px;">12K+</span>
+            <span style="font-size:0.72rem;color:rgba(255,255,255,0.45);">Compradores activos</span>
           </div>
-          <div class="hero-stat">
-            <span class="hero-stat-num">3.4K</span>
-            <span class="hero-stat-label">Publicaciones al mes</span>
+          <div style="padding:0 28px;border-right:1px solid rgba(255,255,255,0.12);">
+            <span style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:#E8B84B;display:block;line-height:1;margin-bottom:4px;">3.4K</span>
+            <span style="font-size:0.72rem;color:rgba(255,255,255,0.45);">Publicaciones al mes</span>
           </div>
-          <div class="hero-stat">
-            <span class="hero-stat-num">32</span>
-            <span class="hero-stat-label">Departamentos cubiertos</span>
+          <div style="padding:0 0 0 28px;">
+            <span style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:#E8B84B;display:block;line-height:1;margin-bottom:4px;">32</span>
+            <span style="font-size:0.72rem;color:rgba(255,255,255,0.45);">Departamentos cubiertos</span>
           </div>
         </div>
+
       </div>
     </div>
   </div>
 </section>
 
-<!-- BARRA DE CONFIANZA -->
 <div class="barra-confianza">
-  <div class="barra-confianza-item">
-    <div class="barra-confianza-icon"><i class="fas fa-check"></i></div>
-    Usuarios verificados
-  </div>
-  <div class="barra-confianza-item">
-    <div class="barra-confianza-icon"><i class="fas fa-lock"></i></div>
-    Transacciones seguras
-  </div>
-  <div class="barra-confianza-item">
-    <div class="barra-confianza-icon"><i class="fas fa-map-marker-alt"></i></div>
-    Mapa de ubicaciones
-  </div>
-  <div class="barra-confianza-item">
-    <div class="barra-confianza-icon"><i class="fas fa-bolt"></i></div>
-    Publicación en minutos
-  </div>
+  <div class="barra-confianza-item"><div class="barra-confianza-icon"><i class="fas fa-check"></i></div>Usuarios verificados</div>
+  <div class="barra-confianza-item"><div class="barra-confianza-icon"><i class="fas fa-lock"></i></div>Transacciones seguras</div>
+  <div class="barra-confianza-item"><div class="barra-confianza-icon"><i class="fas fa-map-marker-alt"></i></div>Mapa de ubicaciones</div>
+  <div class="barra-confianza-item"><div class="barra-confianza-icon"><i class="fas fa-bolt"></i></div>Publicación en minutos</div>
 </div>
 
-<!-- PUBLICACIONES SUGERIDAS -->
 <div class="container seccion">
   <?php
   Conexion::abrir_conexion();
@@ -95,8 +84,7 @@ $deshabilitar_botones = $sesion_iniciada && !$usuario_activo;
   ?>
 </div>
 
-<!-- BÚSQUEDA RÁPIDA -->
-<div style="background: var(--crema-mid); padding: 48px 0;">
+<div style="background:#F0E4C4;padding:48px 0;">
   <div class="container">
     <div class="text-center mb-4">
       <span class="seccion-label">Búsqueda rápida</span>
@@ -113,81 +101,65 @@ $deshabilitar_botones = $sesion_iniciada && !$usuario_activo;
             <label class="form-label"><i class="fas fa-search me-1"></i>¿Qué deseas buscar?</label>
             <select class="form-select" id="tipoBusqueda" name="tipoBusqueda" required>
               <option value="">Selecciona una opción</option>
-              <option value="ganado" <?= (isset($_GET['tipoBusqueda']) && $_GET['tipoBusqueda'] == 'ganado') ? 'selected' : '' ?>>Ganado</option>
-              <option value="caballo" <?= (isset($_GET['tipoBusqueda']) && $_GET['tipoBusqueda'] == 'caballo') ? 'selected' : '' ?>>Caballos</option>
+              <option value="ganado" <?= (isset($_GET['tipoBusqueda']) && $_GET['tipoBusqueda']=='ganado')?'selected':'' ?>>Ganado</option>
+              <option value="caballo" <?= (isset($_GET['tipoBusqueda']) && $_GET['tipoBusqueda']=='caballo')?'selected':'' ?>>Caballos</option>
             </select>
           </div>
 
           <div id="filtros-ganado" style="display:none;" class="col-12">
             <div class="row g-3">
-              <div class="col-md-3"><label class="form-label">Categoría</label>
+              <div class="col-md-3">
+                <label class="form-label">Categoría</label>
                 <select class="form-select" name="categoriaGanado">
                   <option value="">Todas</option>
-                  <option value="Carne">Carne</option>
-                  <option value="Leche">Leche</option>
-                  <option value="Doble propósito">Doble propósito</option>
+                  <option value="Carne" <?= (isset($_GET['categoriaGanado']) && $_GET['categoriaGanado']=='Carne')?'selected':'' ?>>Carne</option>
+                  <option value="Leche" <?= (isset($_GET['categoriaGanado']) && $_GET['categoriaGanado']=='Leche')?'selected':'' ?>>Leche</option>
+                  <option value="Doble propósito" <?= (isset($_GET['categoriaGanado']) && $_GET['categoriaGanado']=='Doble propósito')?'selected':'' ?>>Doble propósito</option>
                 </select>
               </div>
-              <div class="col-md-3"><label class="form-label">Raza</label>
-                <input type="text" class="form-control" name="razaGanado" value="<?= $_GET['razaGanado'] ?? '' ?>" placeholder="Ej: Brahman">
-              </div>
-              <div class="col-md-2"><label class="form-label">Sexo</label>
+              <div class="col-md-3"><label class="form-label">Raza</label><input type="text" class="form-control" name="razaGanado" value="<?= $_GET['razaGanado'] ?? '' ?>" placeholder="Ej: Brahman"></div>
+              <div class="col-md-2">
+                <label class="form-label">Sexo</label>
                 <select class="form-select" name="sexoGanado">
                   <option value="">Todos</option>
-                  <option value="Macho">Macho</option>
-                  <option value="Hembra">Hembra</option>
+                  <option value="Macho" <?= (isset($_GET['sexoGanado']) && $_GET['sexoGanado']=='Macho')?'selected':'' ?>>Macho</option>
+                  <option value="Hembra" <?= (isset($_GET['sexoGanado']) && $_GET['sexoGanado']=='Hembra')?'selected':'' ?>>Hembra</option>
                 </select>
               </div>
-              <div class="col-md-2"><label class="form-label">Departamento</label>
-                <input type="text" class="form-control" name="departamentoGanado" value="<?= $_GET['departamentoGanado'] ?? '' ?>">
-              </div>
-              <div class="col-md-2"><label class="form-label">Municipio</label>
-                <input type="text" class="form-control" name="municipioGanado" value="<?= $_GET['municipioGanado'] ?? '' ?>">
-              </div>
-              <div class="col-md-3"><label class="form-label">Precio mínimo</label>
-                <input type="number" class="form-control" name="precioMin" min="0" value="<?= $_GET['precioMin'] ?? '' ?>">
-              </div>
-              <div class="col-md-3"><label class="form-label">Precio máximo</label>
-                <input type="number" class="form-control" name="precioMax" min="0" value="<?= $_GET['precioMax'] ?? '' ?>">
-              </div>
+              <div class="col-md-2"><label class="form-label">Departamento</label><input type="text" class="form-control" name="departamentoGanado" value="<?= $_GET['departamentoGanado'] ?? '' ?>"></div>
+              <div class="col-md-2"><label class="form-label">Municipio</label><input type="text" class="form-control" name="municipioGanado" value="<?= $_GET['municipioGanado'] ?? '' ?>"></div>
+              <div class="col-md-3"><label class="form-label">Precio mínimo</label><input type="number" class="form-control" name="precioMin" min="0" value="<?= $_GET['precioMin'] ?? '' ?>"></div>
+              <div class="col-md-3"><label class="form-label">Precio máximo</label><input type="number" class="form-control" name="precioMax" min="0" value="<?= $_GET['precioMax'] ?? '' ?>"></div>
             </div>
           </div>
 
           <div id="filtros-caballo" style="display:none;" class="col-12">
             <div class="row g-3">
-              <div class="col-md-3"><label class="form-label">Categoría</label>
+              <div class="col-md-3">
+                <label class="form-label">Categoría</label>
                 <select class="form-select" name="categoriaCaballo">
                   <option value="">Todas</option>
-                  <option value="Caballo Criollo Colombiano">Criollo Colombiano</option>
-                  <option value="Caballo Percherón">Percherón</option>
-                  <option value="Caballo Árabe">Árabe</option>
-                  <option value="Cuarto de Milla">Cuarto de Milla</option>
-                  <option value="Caballos Mulares">Mulares</option>
+                  <option value="Caballo Criollo Colombiano" <?= (isset($_GET['categoriaCaballo']) && $_GET['categoriaCaballo']=='Caballo Criollo Colombiano')?'selected':'' ?>>Criollo Colombiano</option>
+                  <option value="Caballo Percherón" <?= (isset($_GET['categoriaCaballo']) && $_GET['categoriaCaballo']=='Caballo Percherón')?'selected':'' ?>>Percherón</option>
+                  <option value="Caballo Árabe" <?= (isset($_GET['categoriaCaballo']) && $_GET['categoriaCaballo']=='Caballo Árabe')?'selected':'' ?>>Árabe</option>
+                  <option value="Cuarto de Milla" <?= (isset($_GET['categoriaCaballo']) && $_GET['categoriaCaballo']=='Cuarto de Milla')?'selected':'' ?>>Cuarto de Milla</option>
+                  <option value="Caballos Mulares" <?= (isset($_GET['categoriaCaballo']) && $_GET['categoriaCaballo']=='Caballos Mulares')?'selected':'' ?>>Mulares</option>
                 </select>
               </div>
-              <div class="col-md-3"><label class="form-label">Aptitud/Raza</label>
-                <input type="text" class="form-control" name="razaCaballo" value="<?= $_GET['razaCaballo'] ?? '' ?>" placeholder="Ej: Trocha, Paso fino">
-              </div>
-              <div class="col-md-2"><label class="form-label">Sexo</label>
+              <div class="col-md-3"><label class="form-label">Aptitud/Raza</label><input type="text" class="form-control" name="razaCaballo" value="<?= $_GET['razaCaballo'] ?? '' ?>" placeholder="Ej: Trocha, Paso fino"></div>
+              <div class="col-md-2">
+                <label class="form-label">Sexo</label>
                 <select class="form-select" name="sexoCaballo">
                   <option value="">Todos</option>
-                  <option value="Macho">Macho</option>
-                  <option value="Hembra">Hembra</option>
-                  <option value="Macho castrado">Macho castrado</option>
+                  <option value="Macho" <?= ($_GET['sexoCaballo'] ?? '')==='Macho'?'selected':'' ?>>Macho</option>
+                  <option value="Hembra" <?= ($_GET['sexoCaballo'] ?? '')==='Hembra'?'selected':'' ?>>Hembra</option>
+                  <option value="Macho castrado" <?= ($_GET['sexoCaballo'] ?? '')==='Macho castrado'?'selected':'' ?>>Macho castrado</option>
                 </select>
               </div>
-              <div class="col-md-2"><label class="form-label">Departamento</label>
-                <input type="text" class="form-control" name="departamentoCaballo" value="<?= $_GET['departamentoCaballo'] ?? '' ?>">
-              </div>
-              <div class="col-md-2"><label class="form-label">Municipio</label>
-                <input type="text" class="form-control" name="municipioCaballo" value="<?= $_GET['municipioCaballo'] ?? '' ?>">
-              </div>
-              <div class="col-md-3"><label class="form-label">Precio mínimo</label>
-                <input type="number" class="form-control" name="precioMin" min="0" value="<?= $_GET['precioMin'] ?? '' ?>">
-              </div>
-              <div class="col-md-3"><label class="form-label">Precio máximo</label>
-                <input type="number" class="form-control" name="precioMax" min="0" value="<?= $_GET['precioMax'] ?? '' ?>">
-              </div>
+              <div class="col-md-2"><label class="form-label">Departamento</label><input type="text" class="form-control" name="departamentoCaballo" value="<?= $_GET['departamentoCaballo'] ?? '' ?>"></div>
+              <div class="col-md-2"><label class="form-label">Municipio</label><input type="text" class="form-control" name="municipioCaballo" value="<?= $_GET['municipioCaballo'] ?? '' ?>"></div>
+              <div class="col-md-3"><label class="form-label">Precio mínimo</label><input type="number" class="form-control" name="precioMin" min="0" value="<?= $_GET['precioMin'] ?? '' ?>"></div>
+              <div class="col-md-3"><label class="form-label">Precio máximo</label><input type="number" class="form-control" name="precioMax" min="0" value="<?= $_GET['precioMax'] ?? '' ?>"></div>
             </div>
           </div>
 
@@ -202,11 +174,11 @@ $deshabilitar_botones = $sesion_iniciada && !$usuario_activo;
   </div>
 </div>
 
-<!-- RESULTADOS -->
 <?php include_once 'app/FiltroAvanzado.inc.php'; ?>
+
 <?php if (!empty($tarjetas_resultado)): ?>
   <div class="container seccion" id="resultados-busqueda">
-    <h2 class="seccion-titulo text-center"><i class="fas fa-search me-2"></i>Resultados de búsqueda</h2>
+    <h2 class="seccion-titulo text-center">Resultados de búsqueda</h2>
     <div class="row">
       <?php foreach ($tarjetas_resultado as $animal): ?>
         <?php EscritorAnimal::escribir_tarjeta_animal($animal); ?>
@@ -219,20 +191,19 @@ $deshabilitar_botones = $sesion_iniciada && !$usuario_activo;
   </div>
 <?php endif; ?>
 
-<!-- COMPRAR / VENDER -->
 <div class="container seccion">
   <div class="row g-4">
     <div class="col-md-6">
       <div class="card-accion">
-        <h3><i class="fas fa-shopping-cart me-2 text-dorado" style="color:var(--dorado);"></i>¿Quieres Comprar?</h3>
-        <p>Explora cientos de publicaciones de ganado de calidad, compara precios y contacta directamente con los vendedores de todo el país.</p>
-        <a href="<?php echo RUTA_COMPRA; ?>" class="btn btn-tierra btn-lg mt-2" style="background:var(--tierra);color:#fff;border:none;">Ver publicaciones</a>
+        <h3><i class="fas fa-shopping-cart me-2" style="color:var(--dorado);"></i>¿Quieres Comprar?</h3>
+        <p>Explora cientos de publicaciones de ganado de calidad, compara precios y contacta directamente con vendedores de todo el país.</p>
+        <a href="<?php echo RUTA_COMPRA; ?>" class="btn btn-lg mt-2" style="background:var(--tierra);color:#fff;border:none;">Ver publicaciones</a>
       </div>
     </div>
     <div class="col-md-6">
       <div class="card-accion verde">
         <h3><i class="fas fa-bullhorn me-2" style="color:var(--verde);"></i>¿Quieres Vender?</h3>
-        <p>Publica tu ganado en minutos, llega a miles de compradores potenciales y gestiona tus anuncios de forma sencilla y segura.</p>
+        <p>Publica tu ganado en minutos, llega a miles de compradores potenciales y gestiona tus anuncios de forma sencilla.</p>
         <?php if ($sesion_iniciada && $usuario_activo): ?>
           <a href="<?php echo RUTA_VENTA; ?>" class="btn btn-verde btn-lg mt-2">Publicar ahora</a>
         <?php elseif ($sesion_iniciada): ?>
@@ -245,71 +216,61 @@ $deshabilitar_botones = $sesion_iniciada && !$usuario_activo;
   </div>
 </div>
 
-<!-- CARRUSELES -->
-<div class="container">
-  <?php EscritorAnimal::escribir_carrusel_premium(); ?>
-</div>
-<div class="container">
-  <?php EscritorAnimal::escribir_carrusel_destacados(); ?>
-</div>
-<div class="container">
-  <?php EscritorAnimal::escribir_carrusel_ultimas_publicaciones(); ?>
-</div>
+<div class="container"><?php EscritorAnimal::escribir_carrusel_premium(); ?></div>
+<div class="container"><?php EscritorAnimal::escribir_carrusel_destacados(); ?></div>
+<div class="container"><?php EscritorAnimal::escribir_carrusel_ultimas_publicaciones(); ?></div>
 
-<!-- MAPA -->
 <div class="container seccion">
   <div class="text-center mb-4">
     <span class="seccion-label">Geolocalización</span>
     <h2 class="seccion-titulo"><i class="fas fa-map-marked-alt me-2"></i>Animales publicados en Colombia</h2>
     <p class="seccion-sub">Encuentra ganado cerca de ti en los 32 departamentos del país</p>
   </div>
-  <div id="mapa-ubicaciones" style="height:500px;" class="rounded shadow-sm"></div>
+  <div id="mapa-ubicaciones" style="height:500px;"></div>
 </div>
 
 <?php
-Conexion::abrir_conexion();
 $conexion = Conexion::obtener_conexion();
-$sentencia = $conexion->prepare("SELECT * FROM animales WHERE latitud IS NOT NULL AND longitud IS NOT NULL");
-$sentencia->execute();
-$ubicaciones = $sentencia->fetchAll(PDO::FETCH_ASSOC);
-$sentencia_caballos = $conexion->prepare("SELECT * FROM caballos WHERE latitud IS NOT NULL AND longitud IS NOT NULL");
-$sentencia_caballos->execute();
-$ubicaciones_caballos = $sentencia_caballos->fetchAll(PDO::FETCH_ASSOC);
+$s1 = $conexion->prepare("SELECT * FROM animales WHERE latitud IS NOT NULL AND longitud IS NOT NULL");
+$s1->execute();
+$ubicaciones = $s1->fetchAll(PDO::FETCH_ASSOC);
+$s2 = $conexion->prepare("SELECT * FROM caballos WHERE latitud IS NOT NULL AND longitud IS NOT NULL");
+$s2->execute();
+$ubicaciones_caballos = $s2->fetchAll(PDO::FETCH_ASSOC);
 $ubicaciones_totales = array_merge($ubicaciones, $ubicaciones_caballos);
 ?>
 
 <script>
-  var mapa = L.map('mapa-ubicaciones').setView([4.5709, -74.2973], 5);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' }).addTo(mapa);
+  var mapa = L.map('mapa-ubicaciones').setView([4.5709,-74.2973],5);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(mapa);
   var iconoGanandez = L.icon({
-    iconUrl: '<?php echo SERVIDOR . "/img/logo-vaca-dorado-sm.png"; ?>',
-    iconSize: [40, 40], iconAnchor: [20, 35], popupAnchor: [0, -60], className: 'icono-redondo'
+    iconUrl:'<?php echo SERVIDOR."/img/logo-vaca-dorado-sm.png"; ?>',
+    iconSize:[40,40],iconAnchor:[20,35],popupAnchor:[0,-60],className:'icono-redondo'
   });
 </script>
 
 <?php foreach ($ubicaciones_totales as $ubicacion):
-  $es_caballo = array_key_exists('precio', $ubicacion) && array_key_exists('caracteristicas', $ubicacion);
+  $es_caballo = array_key_exists('caracteristicas',$ubicacion);
   $animal = $es_caballo
-    ? RepositorioCaballo::obtener_caballo_por_id($conexion, $ubicacion['id'])
-    : RepositorioAnimal::obtener_animal_por_id($conexion, $ubicacion['id']);
-  if (method_exists($animal, 'esta_vendido') && $animal->esta_vendido()) continue;
-  $url = $es_caballo ? SERVIDOR . '/caballo/' . $animal->obtener_id() : SERVIDOR . '/animal/' . $animal->obtener_id();
-  $precio_formateado = '$ ' . number_format($animal->obtener_precio(), 0, ',', '.');
+    ? RepositorioCaballo::obtener_caballo_por_id($conexion,$ubicacion['id'])
+    : RepositorioAnimal::obtener_animal_por_id($conexion,$ubicacion['id']);
+  if (method_exists($animal,'esta_vendido') && $animal->esta_vendido()) continue;
+  $url = $es_caballo ? SERVIDOR.'/caballo/'.$animal->obtener_id() : SERVIDOR.'/animal/'.$animal->obtener_id();
+  $precio = '$ '.number_format($animal->obtener_precio(),0,',','.');
   $titulo = htmlspecialchars($animal->obtener_titulo());
-  $categoria = htmlspecialchars($animal->obtener_categoria());
 ?>
-  <script>
-    L.marker([<?= $ubicacion['latitud'] ?>, <?= $ubicacion['longitud'] ?>], { icon: iconoGanandez })
-      .addTo(mapa)
-      .bindPopup('<a href="<?= $url ?>" style="text-decoration:none;color:inherit;"><div style="text-align:center;padding:8px;"><strong><?= $titulo ?></strong><br><span style="color:#C8961E;font-size:1.1rem;"><?= $precio_formateado ?></span><br><small><?= $categoria ?></small></div></a>');
-  </script>
+<script>
+  L.marker([<?= $ubicacion['latitud'] ?>,<?= $ubicacion['longitud'] ?>],{icon:iconoGanandez})
+    .addTo(mapa)
+    .bindPopup('<a href="<?= $url ?>" style="text-decoration:none;color:inherit;"><div style="text-align:center;padding:8px;"><strong><?= $titulo ?></strong><br><span style="color:#C8961E;font-size:1.1rem;"><?= $precio ?></span></div></a>');
+</script>
 <?php endforeach; ?>
 
 <script>
-  function mostrarFiltros() {
-    var tipo = document.getElementById('tipoBusqueda').value;
-    document.getElementById('filtros-ganado').style.display = (tipo === 'ganado') ? 'block' : 'none';
-    document.getElementById('filtros-caballo').style.display = (tipo === 'caballo') ? 'block' : 'none';
+  function mostrarFiltros(){
+    var t = document.getElementById('tipoBusqueda').value;
+    document.getElementById('filtros-ganado').style.display = (t==='ganado') ? 'block' : 'none';
+    document.getElementById('filtros-caballo').style.display = (t==='caballo') ? 'block' : 'none';
   }
   document.getElementById('tipoBusqueda').addEventListener('change', mostrarFiltros);
   window.addEventListener('DOMContentLoaded', mostrarFiltros);
