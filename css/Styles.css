@@ -100,7 +100,7 @@ a:hover { color: var(--verde-mid); }
 /* HERO */
 .hero-principal {
   background: linear-gradient(135deg, var(--tierra) 0%, #1a0f0a 100%);
-  min-height: 88vh;
+  min-height: 42vh;
   display: flex;
   align-items: center;
   padding: 90px 0 60px;
