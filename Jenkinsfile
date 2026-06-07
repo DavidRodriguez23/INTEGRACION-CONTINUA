@@ -27,26 +27,44 @@ pipeline {
         stage('Pruebas (PHPUnit)') {
             steps {
                 echo 'Ejecutando pruebas unitarias con PHPUnit...'
-                // Se ejecutan dentro de un contenedor efimero con PHP + Composer.
+                // PHP y Composer estan instalados en la imagen de Jenkins
+                // (ver Dockerfile.jenkins), por eso se ejecutan directamente.
                 sh '''
-                    docker run --rm \
-                        -v "$WORKSPACE":/app -w /app \
-                        composer:2 sh -c "composer install --no-interaction && vendor/bin/phpunit --log-junit build/junit.xml"
+                    composer install --no-interaction --no-progress
+                    vendor/bin/phpunit --log-junit build/junit.xml
                 '''
             }
         }
 
         stage('Construir imagen') {
             steps {
-                echo 'Construyendo la imagen de la aplicacion...'
-                sh 'docker compose build'
+                echo 'Construyendo la imagen de la aplicacion web...'
+                // Solo la imagen "web"; no se reconstruye el propio Jenkins.
+                sh 'docker compose build web'
             }
         }
 
         stage('Desplegar') {
             steps {
-                echo 'Levantando los contenedores...'
-                sh 'docker compose up -d'
+                echo 'Levantando los contenedores web y db...'
+                // Solo web y db, para no recrear el contenedor de Jenkins.
+                sh 'docker compose up -d db'
+                echo 'Esperando a que MySQL acepte conexiones...'
+                sh '''
+                    for i in $(seq 1 20); do
+                        if docker compose exec -T db mysqladmin ping -h localhost -uroot -proot_password --silent; then
+                            echo "MySQL listo."
+                            break
+                        fi
+                        echo "Esperando MySQL... intento $i"
+                        sleep 3
+                    done
+                '''
+                echo 'Sembrando la base de datos (via stdin, compatible con Docker Desktop)...'
+                // El bind-mount de sql/IT.sql no funciona bajo "Docker fuera de Docker";
+                // por eso se carga el script por stdin a traves del cliente docker.
+                sh 'docker compose exec -T db mysql -uroot -proot_password IT < sql/IT.sql || true'
+                sh 'docker compose up -d web'
             }
         }
 
@@ -73,7 +91,7 @@ pipeline {
             steps {
                 echo 'Generando reporte de integracion continua...'
                 echo 'Proyecto: Ganaderia Livestock'
-                echo 'Repositorio: https://github.com/DavidRodriguez23/INTEGRACION-CONTINUA'
+                echo 'Repositorio: https://github.com/david-develop/INTEGRACION-CONTINUA'
                 echo 'Estado: Codigo probado, construido y desplegado.'
             }
         }

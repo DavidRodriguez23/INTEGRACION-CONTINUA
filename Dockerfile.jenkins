@@ -18,6 +18,9 @@ RUN apt-get update \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
         docker-ce-cli docker-compose-plugin \
+        php-cli php-xml php-mbstring unzip \
+    && curl -sS https://getcomposer.org/installer \
+        | php -- --install-dir=/usr/local/bin --filename=composer \
     && rm -rf /var/lib/apt/lists/*
 
 USER jenkins
