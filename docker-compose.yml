@@ -1,5 +1,10 @@
 version: '3.8'
 
+# Nombre de proyecto FIJO. Sin esto, Compose usa el nombre de la carpeta:
+# en tu maquina seria "integracion-continua" pero en Jenkins seria el nombre
+# del workspace, creando una red distinta donde "web" no resuelve a "db".
+name: integracion-continua
+
 services:
 
   web:

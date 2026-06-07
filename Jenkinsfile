@@ -71,10 +71,12 @@ pipeline {
         stage('Smoke test') {
             steps {
                 echo 'Verificando que la aplicacion responde...'
-                // Espera a que el contenedor web este arriba y responde 200.
+                // IMPORTANTE: el curl corre DENTRO del contenedor de Jenkins, donde
+                // "localhost" es el propio Jenkins. Se consulta el servicio "web" por
+                // su nombre en la red de Docker (puerto 80 interno), no localhost:8080.
                 sh '''
                     for i in $(seq 1 10); do
-                        if curl -fsS http://localhost:8080/ > /dev/null; then
+                        if curl -fsS http://web:80/ > /dev/null; then
                             echo "Aplicacion respondiendo correctamente."
                             exit 0
                         fi
