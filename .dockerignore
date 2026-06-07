@@ -16,7 +16,3 @@ composer.lock
 
 # Documentacion
 README.md
-
-# Variables de entorno y secretos
-.env
-.env.example

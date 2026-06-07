@@ -23,15 +23,15 @@ services:
     image: mysql:8.0
     container_name: ganandez_db
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: IT
+      MYSQL_USER: ganandez_user
+      MYSQL_PASSWORD: ganandez_pass
     volumes:
       - db_data:/var/lib/mysql
       - ./sql/IT.sql:/docker-entrypoint-initdb.d/IT.sql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_password"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -39,10 +39,13 @@ services:
       - ganandez-net
 
   jenkins:
-    image: jenkins/jenkins:lts
+    # Imagen propia (Dockerfile.jenkins) con el cliente Docker ya instalado,
+    # para que el pipeline pueda construir/desplegar usando el socket del host.
+    build:
+      context: .
+      dockerfile: Dockerfile.jenkins
     container_name: ganandez_jenkins
-    # Se ejecuta como root y se monta el socket de Docker para que el pipeline
-    # pueda construir imagenes y desplegar contenedores desde dentro de Jenkins.
+    # Se ejecuta como root para poder usar el socket de Docker montado.
     user: root
     ports:
       - "8081:8080"
@@ -50,7 +53,6 @@ services:
     volumes:
       - jenkins_data:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
-      - /usr/bin/docker:/usr/bin/docker
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/login"]
       interval: 30s

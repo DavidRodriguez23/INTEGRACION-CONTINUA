@@ -2,14 +2,14 @@ pipeline {
     agent any
 
     options {
-        // 3.2 - Un build colgado libera el agente tras 30 minutos.
+        //Un build colgado libera el agente tras 30 minutos.
         timeout(time: 30, unit: 'MINUTES')
-        // 3.3 - Evita que dos builds simultaneos se pisen Docker Compose.
+        // Evita que dos builds simultaneos se pisen Docker Compose.
         disableConcurrentBuilds()
     }
 
     triggers {
-        // 1.4 - Dispara el pipeline automaticamente con el webhook de GitHub.
+        // Dispara el pipeline automaticamente con el webhook de GitHub.
         // Requiere el plugin "GitHub" y el webhook configurado en
         // GitHub -> Settings -> Webhooks -> http://<jenkins>:8081/github-webhook/
         githubPush()
@@ -80,7 +80,7 @@ pipeline {
     }
 
     post {
-        // 3.6 - Conserva el reporte de pruebas y publica los resultados JUnit en cada build.
+        // Conserva el reporte de pruebas y publica los resultados JUnit en cada build.
         always {
             junit allowEmptyResults: true, testResults: 'build/junit.xml'
             archiveArtifacts artifacts: 'build/junit.xml', allowEmptyArchive: true, fingerprint: true

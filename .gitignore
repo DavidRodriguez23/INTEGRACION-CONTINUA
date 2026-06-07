@@ -1,6 +1,3 @@
-# Secretos / variables de entorno (usar .env.example como plantilla)
-.env
-
 # Dependencias y artefactos de pruebas
 /vendor/
 /build/
@@ -9,3 +6,5 @@ composer.lock
 
 # IDE
 .idea/
+
+ngroc-key
