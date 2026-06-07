@@ -1,0 +1,11 @@
+# Secretos / variables de entorno (usar .env.example como plantilla)
+.env
+
+# Dependencias y artefactos de pruebas
+/vendor/
+/build/
+composer.lock
+.phpunit.result.cache
+
+# IDE
+.idea/

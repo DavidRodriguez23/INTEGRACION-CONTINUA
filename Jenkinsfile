@@ -1,6 +1,20 @@
 pipeline {
     agent any
 
+    options {
+        // 3.2 - Un build colgado libera el agente tras 30 minutos.
+        timeout(time: 30, unit: 'MINUTES')
+        // 3.3 - Evita que dos builds simultaneos se pisen Docker Compose.
+        disableConcurrentBuilds()
+    }
+
+    triggers {
+        // 1.4 - Dispara el pipeline automaticamente con el webhook de GitHub.
+        // Requiere el plugin "GitHub" y el webhook configurado en
+        // GitHub -> Settings -> Webhooks -> http://<jenkins>:8081/github-webhook/
+        githubPush()
+    }
+
     stages {
 
         stage('Clonar repositorio') {
@@ -10,26 +24,48 @@ pipeline {
             }
         }
 
-        stage('Verificar archivos') {
+        stage('Pruebas (PHPUnit)') {
             steps {
-                echo 'Verificando estructura del proyecto...'
-                sh 'ls -la'
+                echo 'Ejecutando pruebas unitarias con PHPUnit...'
+                // Se ejecutan dentro de un contenedor efimero con PHP + Composer.
+                sh '''
+                    docker run --rm \
+                        -v "$WORKSPACE":/app -w /app \
+                        composer:2 sh -c "composer install --no-interaction && vendor/bin/phpunit --log-junit build/junit.xml"
+                '''
             }
         }
 
-        stage('Verificar configuracion Docker') {
+        stage('Construir imagen') {
             steps {
-                echo 'Verificando archivos de configuracion Docker...'
-                sh 'cat Dockerfile'
-                sh 'cat docker-compose.yml'
+                echo 'Construyendo la imagen de la aplicacion...'
+                sh 'docker compose build'
             }
         }
 
-        stage('Validar estructura PHP') {
+        stage('Desplegar') {
             steps {
-                echo 'Validando archivos PHP del proyecto...'
-                sh 'find . -name "*.php" | head -20'
-                sh 'find . -name "*.sql" | head -5'
+                echo 'Levantando los contenedores...'
+                sh 'docker compose up -d'
+            }
+        }
+
+        stage('Smoke test') {
+            steps {
+                echo 'Verificando que la aplicacion responde...'
+                // Espera a que el contenedor web este arriba y responde 200.
+                sh '''
+                    for i in $(seq 1 10); do
+                        if curl -fsS http://localhost:8080/ > /dev/null; then
+                            echo "Aplicacion respondiendo correctamente."
+                            exit 0
+                        fi
+                        echo "Esperando a la aplicacion... intento $i"
+                        sleep 5
+                    done
+                    echo "La aplicacion no respondio a tiempo."
+                    exit 1
+                '''
             }
         }
 
@@ -38,15 +74,19 @@ pipeline {
                 echo 'Generando reporte de integracion continua...'
                 echo 'Proyecto: Ganaderia Livestock'
                 echo 'Repositorio: https://github.com/DavidRodriguez23/INTEGRACION-CONTINUA'
-                echo 'Rama: main'
-                echo 'Estado: Codigo verificado y listo para despliegue'
+                echo 'Estado: Codigo probado, construido y desplegado.'
             }
         }
     }
 
     post {
+        // 3.6 - Conserva el reporte de pruebas y publica los resultados JUnit en cada build.
+        always {
+            junit allowEmptyResults: true, testResults: 'build/junit.xml'
+            archiveArtifacts artifacts: 'build/junit.xml', allowEmptyArchive: true, fingerprint: true
+        }
         success {
-            echo 'Pipeline ejecutado exitosamente. Ganaderia Livestock verificado.'
+            echo 'Pipeline ejecutado exitosamente. Ganaderia Livestock desplegado.'
         }
         failure {
             echo 'El pipeline fallo. Revisar logs.'
