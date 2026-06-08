@@ -43,7 +43,7 @@ despliegue contenedores desde dentro de Jenkins ("Docker fuera de Docker").
 
 ```bash
 # 1. Clonar el repositorio
-git clone https://github.com/DavidRodriguez23/INTEGRACION-CONTINUA.git
+git https://github.com/david-develop/INTEGRACION-CONTINUA.git
 cd INTEGRACION-CONTINUA
 
 # 2. Levantar los tres contenedores
