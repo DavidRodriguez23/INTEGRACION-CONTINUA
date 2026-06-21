@@ -18,7 +18,7 @@ jobs:
 
     steps:
       - name: Checkout del código
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: Instalar PHP 8.1
         uses: shivammathur/setup-php@v2
@@ -67,7 +67,7 @@ jobs:
 
     steps:
       - name: Checkout del código
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: Verificar archivos y directorios requeridos
         run: |
@@ -125,7 +125,7 @@ jobs:
 
     steps:
       - name: Checkout del código
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: Verificar Dockerfile
         run: |
