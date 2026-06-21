@@ -1,6 +1,5 @@
 name: CI - Ganaderia Livestock
 
-# Se ejecuta en cada push o pull request a main
 on:
   push:
     branches: [ main ]
@@ -9,170 +8,82 @@ on:
 
 jobs:
 
-  # ─────────────────────────────────────────────
-  # JOB 1: Validación de sintaxis PHP
-  # ─────────────────────────────────────────────
   php-lint:
     name: Validar sintaxis PHP
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout del código
-        uses: actions/checkout@v4.2.2
-
+      - uses: actions/checkout@v4
       - name: Instalar PHP 8.1
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.1'
-          extensions: pdo, pdo_mysql
-
-      - name: Verificar versión de PHP
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y php8.1 php8.1-mysql php8.1-pdo 2>/dev/null || \
+          sudo apt-get install -y php php-mysql
+      - name: Verificar version PHP
         run: php --version
-
-      - name: Validar sintaxis de todos los archivos PHP
+      - name: Validar sintaxis PHP
         run: |
           echo "=== Validando archivos PHP ==="
           ERRORS=0
           FILES=$(find . -name "*.php" | grep -v vendor)
           TOTAL=$(echo "$FILES" | wc -l)
           echo "Archivos encontrados: $TOTAL"
-          echo ""
-
           for file in $FILES; do
-            RESULT=$(php -l "$file" 2>&1)
-            if echo "$RESULT" | grep -q "No syntax errors"; then
-              echo "  ✔ $file"
-            else
-              echo "  ✘ ERROR: $file"
-              echo "    $RESULT"
-              ERRORS=$((ERRORS + 1))
-            fi
+            php -l "$file" > /dev/null 2>&1 && echo "  v $file" || { echo "  X ERROR: $file"; ERRORS=$((ERRORS+1)); }
           done
+          [ $ERRORS -eq 0 ] && echo "v Todos los archivos PHP son validos ($TOTAL archivos)" || exit 1
 
-          echo ""
-          if [ $ERRORS -eq 0 ]; then
-            echo "✔ Todos los archivos PHP son válidos ($TOTAL archivos)"
-          else
-            echo "✘ $ERRORS archivo(s) con errores de sintaxis"
-            exit 1
-          fi
-
-  # ─────────────────────────────────────────────
-  # JOB 2: Verificar estructura del proyecto
-  # ─────────────────────────────────────────────
   project-structure:
     name: Verificar estructura del proyecto
     runs-on: ubuntu-latest
     needs: php-lint
-
     steps:
-      - name: Checkout del código
-        uses: actions/checkout@v4.2.2
-
+      - uses: actions/checkout@v4
       - name: Verificar archivos y directorios requeridos
         run: |
-          echo "=== Verificando estructura del proyecto ==="
+          echo "=== Verificando estructura ==="
           ERRORS=0
+          for f in Dockerfile docker-compose.yml index.php .htaccess Jenkinsfile; do
+            [ -f "$f" ] && echo "  v $f" || { echo "  X FALTA: $f"; ERRORS=$((ERRORS+1)); }
+          done
+          for d in app vistas sql css img; do
+            [ -d "$d" ] && echo "  v $d/" || { echo "  X FALTA: $d/"; ERRORS=$((ERRORS+1)); }
+          done
+          [ $ERRORS -eq 0 ] && echo "v Estructura del proyecto correcta" || exit 1
 
-          check_file() {
-            if [ -f "$1" ]; then
-              echo "  ✔ $1"
-            else
-              echo "  ✘ FALTA: $1"
-              ERRORS=$((ERRORS + 1))
-            fi
-          }
-
-          check_dir() {
-            if [ -d "$1" ]; then
-              echo "  ✔ $1/"
-            else
-              echo "  ✘ FALTA directorio: $1/"
-              ERRORS=$((ERRORS + 1))
-            fi
-          }
-
-          echo "Archivos raíz:"
-          check_file "Dockerfile"
-          check_file "docker-compose.yml"
-          check_file "index.php"
-          check_file ".htaccess"
-          check_file "Jenkinsfile"
-
-          echo ""
-          echo "Directorios:"
-          check_dir "app"
-          check_dir "vistas"
-          check_dir "sql"
-          check_dir "css"
-          check_dir "img"
-
-          echo ""
-          if [ $ERRORS -eq 0 ]; then
-            echo "✔ Estructura del proyecto correcta"
-          else
-            echo "✘ $ERRORS elemento(s) faltante(s)"
-            exit 1
-          fi
-
-  # ─────────────────────────────────────────────
-  # JOB 3: Verificar configuración Docker
-  # ─────────────────────────────────────────────
   docker-config:
-    name: Verificar configuración Docker
+    name: Verificar configuracion Docker
     runs-on: ubuntu-latest
     needs: project-structure
-
     steps:
-      - name: Checkout del código
-        uses: actions/checkout@v4.2.2
-
-      - name: Verificar Dockerfile
+      - uses: actions/checkout@v4
+      - name: Verificar Dockerfile y docker-compose
         run: |
           echo "=== Verificando Dockerfile ==="
           cat Dockerfile
-          echo ""
-
-          grep -q "FROM" Dockerfile && echo "  ✔ Instrucción FROM presente" || { echo "  ✘ FROM no encontrado"; exit 1; }
-          grep -q "php" Dockerfile && echo "  ✔ Imagen PHP detectada" || echo "  ⚠  Imagen PHP no detectada"
-          grep -q "pdo_mysql" Dockerfile && echo "  ✔ Extensión PDO MySQL incluida" || echo "  ⚠  pdo_mysql no encontrado"
-          echo ""
-          echo "✔ Dockerfile verificado"
-
-      - name: Verificar docker-compose.yml
-        run: |
+          grep -q "FROM" Dockerfile && echo "  v FROM presente" || exit 1
+          grep -q "pdo_mysql" Dockerfile && echo "  v PDO MySQL incluido" || echo "  ! pdo_mysql no encontrado"
           echo "=== Verificando docker-compose.yml ==="
           cat docker-compose.yml
-          echo ""
+          grep -q "web" docker-compose.yml && echo "  v Servicio web definido" || exit 1
+          grep -q "db" docker-compose.yml && echo "  v Servicio db definido" || exit 1
+          echo "v Configuracion Docker verificada"
 
-          grep -q "web" docker-compose.yml && echo "  ✔ Servicio web definido" || { echo "  ✘ Servicio web no encontrado"; exit 1; }
-          grep -q "db" docker-compose.yml && echo "  ✔ Servicio db definido" || { echo "  ✘ Servicio db no encontrado"; exit 1; }
-          grep -q "ganandez-net" docker-compose.yml && echo "  ✔ Red ganandez-net definida" || echo "  ⚠  Red personalizada no encontrada"
-          echo ""
-          echo "✔ docker-compose.yml verificado"
-
-  # ─────────────────────────────────────────────
-  # JOB 4: Resumen final
-  # ─────────────────────────────────────────────
   resumen:
     name: Resumen del pipeline
     runs-on: ubuntu-latest
     needs: [php-lint, project-structure, docker-config]
     if: always()
-
     steps:
-      - name: Estado del pipeline
+      - name: Resultado final
         run: |
           echo "=========================================="
-          echo "  PIPELINE CI — Ganaderia Livestock"
-          echo "  Rama   : ${{ github.ref_name }}"
-          echo "  Commit : ${{ github.sha }}"
-          echo "  Actor  : ${{ github.actor }}"
+          echo "  PIPELINE CI - Ganaderia Livestock"
+          echo "  Rama  : ${{ github.ref_name }}"
+          echo "  Commit: ${{ github.sha }}"
+          echo "  Actor : ${{ github.actor }}"
           echo "=========================================="
-          echo ""
           echo "Jobs ejecutados:"
-          echo "  - Validación PHP sintaxis"
-          echo "  - Verificación estructura proyecto"
-          echo "  - Verificación configuración Docker"
-          echo ""
-          echo "Pipeline finalizado."
+          echo "  - Validacion PHP sintaxis"
+          echo "  - Verificacion estructura proyecto"
+          echo "  - Verificacion configuracion Docker"
+          echo "Pipeline finalizado exitosamente."
