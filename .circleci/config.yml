@@ -1,0 +1,41 @@
+# CircleCI - CI en la nube para Ganaderia Livestock.
+version: 2.1
+
+jobs:
+
+  # Job 1: instala dependencias y corre las pruebas unitarias.
+  pruebas:
+    docker:
+      - image: cimg/php:8.1
+    steps:
+      - checkout
+      - run:
+          name: Instalar dependencias (Composer)
+          command: composer install --no-interaction --no-progress
+      - run:
+          name: Ejecutar pruebas (PHPUnit)
+          command: vendor/bin/phpunit --log-junit build/junit.xml
+      - store_test_results:
+          path: build
+      - store_artifacts:
+          path: build/junit.xml
+
+  # Job 2: valida que la imagen Docker de la aplicacion construya correctamente.
+  construir-imagen:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: default
+      - run:
+          name: Construir imagen Docker de la app web
+          command: docker build -t ganandez_web:ci .
+
+workflows:
+  integracion-continua:
+    jobs:
+      - pruebas
+      - construir-imagen:
+          requires:
+            - pruebas
