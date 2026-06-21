@@ -120,3 +120,40 @@ Luego, en GitHub → **Settings → Webhooks → Add webhook**:
 
 > El trigger `githubPush()` se activa **después de la primera ejecución manual** del job
 > (Jenkins debe leer el `Jenkinsfile` una vez para registrar el disparador).
+
+## 🌐 Entrega 3 — CI en la nube (Travis CI + CircleCI)
+
+La plataforma queda integrada con **tres herramientas de integración continua**, cada una con
+un rol distinto, demostrando un flujo de CI completo y redundante:
+
+| Herramienta | Tipo | Rol | Configuración |
+|---|---|---|---|
+| **Jenkins** | Self-hosted | Build + despliegue + smoke test (local) | `Jenkinsfile` |
+| **Travis CI** | Nube (SaaS) | Pruebas en cada push y Pull Request | `.travis.yml` |
+| **CircleCI** | Nube (SaaS) | Pruebas + validación del build Docker | `.circleci/config.yml` |
+
+> **Nota sobre Codeship:** el escenario original pedía Codeship, pero **CloudBees lo
+> descontinuó en 2023**. Se reemplaza por **CircleCI**, que cumple la misma función (CI
+> hospedado en la nube conectado a GitHub). De igual forma, **Travis CI dejó de ser gratuito
+> para open source en 2020**; se incluye su configuración y se documenta esta limitación.
+
+### Travis CI (`.travis.yml`)
+
+Sigue el ciclo de vida del Escenario 7 (`install` → `script`):
+
+- **`install`**: `composer install` (descarga PHPUnit)
+- **`script`**: `vendor/bin/phpunit`
+- **Branch build flow**: compila `main` y ramas `feature/*`; los Pull Request se compilan automáticamente.
+
+**Activación:** iniciar sesión en https://www.travis-ci.com con la cuenta de GitHub, autorizar
+el repositorio y empujar un cambio.
+
+### CircleCI (`.circleci/config.yml`)
+
+Workflow `integracion-continua` con dos jobs encadenados:
+
+1. **`pruebas`** — instala dependencias y corre PHPUnit (publica resultados de test).
+2. **`construir-imagen`** — valida que `docker build` de la app funcione (corre solo si pasan las pruebas).
+
+**Activación:** iniciar sesión en https://app.circleci.com con la cuenta de GitHub, seleccionar
+el repositorio en *Projects → Set Up Project* y elegir la rama con el archivo de configuración.
