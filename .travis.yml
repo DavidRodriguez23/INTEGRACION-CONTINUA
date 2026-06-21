@@ -1,0 +1,21 @@
+# Travis CI - Integracion continua en la nube para Ganaderia Livestock.
+language: php
+
+# Version de PHP igual a la del contenedor web (php:8.1-apache).
+php:
+  - "8.1"
+
+# Branch build flow: Travis compila estas ramas (y los Pull Request
+# hacia ellas se compilan automaticamente -> pull request build flow).
+branches:
+  only:
+    - main
+    - /^feature\/.*$/
+
+# Instalacion de dependencias (PHPUnit via Composer).
+install:
+  - composer install --no-interaction --no-progress
+
+# Ejecucion de las pruebas unitarias.
+script:
+  - vendor/bin/phpunit --log-junit build/junit.xml
