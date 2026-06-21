@@ -1,55 +1,144 @@
 pipeline {
     agent any
 
+    environment {
+        APP_NAME = 'Ganaderia-Livestock'
+        PHP_VERSION = '8.1'
+    }
+
     stages {
 
-        stage('Clonar repositorio') {
+        stage('Checkout') {
             steps {
-                echo 'Clonando repositorio de Ganaderia Livestock...'
+                echo '=== Clonando repositorio desde GitHub ==='
                 checkout scm
+                echo "Rama: ${env.GIT_BRANCH}"
+                echo "Commit: ${env.GIT_COMMIT}"
             }
         }
 
-        stage('Verificar archivos') {
+        stage('Verificar entorno') {
             steps {
-                echo 'Verificando estructura del proyecto...'
+                echo '=== Verificando herramientas disponibles ==='
+                sh 'php --version'
+                sh 'docker --version || echo "Docker no disponible en este agente"'
+                sh 'echo "Directorio de trabajo: $(pwd)"'
                 sh 'ls -la'
             }
         }
 
-        stage('Verificar configuracion Docker') {
+        stage('Validar sintaxis PHP') {
             steps {
-                echo 'Verificando archivos de configuracion Docker...'
-                sh 'cat Dockerfile'
-                sh 'cat docker-compose.yml'
+                echo '=== Validando sintaxis de archivos PHP ==='
+                sh '''
+                    echo "Archivos PHP encontrados:"
+                    find . -name "*.php" | grep -v vendor | head -30
+
+                    echo ""
+                    echo "Ejecutando validacion de sintaxis..."
+                    ERROR=0
+                    for file in $(find . -name "*.php" | grep -v vendor); do
+                        php -l "$file" > /dev/null 2>&1 || { echo "ERROR de sintaxis en: $file"; ERROR=1; }
+                    done
+
+                    if [ $ERROR -eq 0 ]; then
+                        echo "✔ Todos los archivos PHP son validos"
+                    else
+                        echo "✘ Se encontraron errores de sintaxis"
+                        exit 1
+                    fi
+                '''
             }
         }
 
-        stage('Validar estructura PHP') {
+        stage('Verificar estructura del proyecto') {
             steps {
-                echo 'Validando archivos PHP del proyecto...'
-                sh 'find . -name "*.php" | head -20'
-                sh 'find . -name "*.sql" | head -5'
+                echo '=== Verificando estructura de directorios y archivos clave ==='
+                sh '''
+                    ERRORES=0
+
+                    check_file() {
+                        if [ -f "$1" ]; then
+                            echo "  ✔ $1"
+                        else
+                            echo "  ✘ FALTA: $1"
+                            ERRORES=1
+                        fi
+                    }
+
+                    check_dir() {
+                        if [ -d "$1" ]; then
+                            echo "  ✔ $1/"
+                        else
+                            echo "  ✘ FALTA directorio: $1/"
+                            ERRORES=1
+                        fi
+                    }
+
+                    echo "Archivos raiz:"
+                    check_file "Dockerfile"
+                    check_file "docker-compose.yml"
+                    check_file "index.php"
+                    check_file ".htaccess"
+
+                    echo "Directorios:"
+                    check_dir "app"
+                    check_dir "vistas"
+                    check_dir "sql"
+                    check_dir "css"
+
+                    if [ $ERRORES -eq 0 ]; then
+                        echo ""
+                        echo "✔ Estructura del proyecto correcta"
+                    else
+                        echo ""
+                        echo "✘ Faltan archivos o directorios requeridos"
+                        exit 1
+                    fi
+                '''
             }
         }
 
-        stage('Reporte de integracion') {
+        stage('Verificar Dockerfile') {
             steps {
-                echo 'Generando reporte de integracion continua...'
-                echo 'Proyecto: Ganaderia Livestock'
-                echo 'Repositorio: https://github.com/DavidRodriguez23/INTEGRACION-CONTINUA'
-                echo 'Rama: main'
-                echo 'Estado: Codigo verificado y listo para despliegue'
+                echo '=== Verificando configuracion de Docker ==='
+                sh '''
+                    echo "Contenido del Dockerfile:"
+                    cat Dockerfile
+
+                    echo ""
+                    echo "Verificando instrucciones minimas..."
+                    grep -q "FROM" Dockerfile && echo "  ✔ FROM definido" || { echo "  ✘ FROM no encontrado"; exit 1; }
+                    grep -q "php" Dockerfile && echo "  ✔ Imagen PHP detectada" || echo "  ⚠ No se detectó imagen PHP explícita"
+                    grep -q "pdo_mysql" Dockerfile && echo "  ✔ Extension PDO MySQL incluida" || echo "  ⚠ Extension PDO MySQL no encontrada"
+                    echo ""
+                    echo "✔ Dockerfile valido"
+                '''
             }
         }
+
     }
 
     post {
         success {
-            echo 'Pipeline ejecutado exitosamente. Ganaderia Livestock verificado.'
+            echo """
+            ==========================================
+            ✔ PIPELINE EXITOSO — ${APP_NAME}
+            Rama    : ${env.GIT_BRANCH ?: 'main'}
+            Commit  : ${env.GIT_COMMIT ?: 'N/A'}
+            ==========================================
+            """
         }
         failure {
-            echo 'El pipeline fallo. Revisar logs.'
+            echo """
+            ==========================================
+            ✘ PIPELINE FALLIDO — ${APP_NAME}
+            Revisa los logs para identificar el error.
+            ==========================================
+            """
+        }
+        always {
+            echo '=== Pipeline finalizado ==='
         }
     }
 }
