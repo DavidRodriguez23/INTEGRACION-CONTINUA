@@ -1,0 +1,77 @@
+version: 2.1
+
+jobs:
+
+  validar-php:
+    docker:
+      - image: php:8.1-apache
+    steps:
+      - checkout
+      - run:
+          name: Instalar extensiones PHP
+          command: |
+            docker-php-ext-install pdo pdo_mysql
+      - run:
+          name: Validar sintaxis de archivos PHP
+          command: |
+            echo "=== Validando archivos PHP ==="
+            ERRORS=0
+            FILES=$(find . -name "*.php" | grep -v vendor)
+            TOTAL=$(echo "$FILES" | wc -l)
+            echo "Archivos encontrados: $TOTAL"
+            for file in $FILES; do
+              php -l "$file" > /dev/null 2>&1 && echo "  v $file" || { echo "  X ERROR: $file"; ERRORS=$((ERRORS+1)); }
+            done
+            [ $ERRORS -eq 0 ] && echo "v Todos los archivos PHP son validos ($TOTAL archivos)" || exit 1
+
+  verificar-estructura:
+    docker:
+      - image: php:8.1-apache
+    steps:
+      - checkout
+      - run:
+          name: Verificar archivos y directorios requeridos
+          command: |
+            echo "=== Verificando estructura del proyecto ==="
+            ERRORS=0
+            for f in Dockerfile docker-compose.yml index.php .htaccess Jenkinsfile; do
+              [ -f "$f" ] && echo "  v $f" || { echo "  X FALTA: $f"; ERRORS=$((ERRORS+1)); }
+            done
+            for d in app vistas sql css img; do
+              [ -d "$d" ] && echo "  v $d/" || { echo "  X FALTA: $d/"; ERRORS=$((ERRORS+1)); }
+            done
+            [ $ERRORS -eq 0 ] && echo "v Estructura del proyecto correcta" || exit 1
+
+  verificar-docker:
+    docker:
+      - image: php:8.1-apache
+    steps:
+      - checkout
+      - run:
+          name: Verificar Dockerfile
+          command: |
+            echo "=== Verificando Dockerfile ==="
+            cat Dockerfile
+            grep -q "FROM" Dockerfile && echo "  v FROM presente" || exit 1
+            grep -q "pdo_mysql" Dockerfile && echo "  v PDO MySQL incluido" || echo "  ! pdo_mysql no encontrado"
+            echo "v Dockerfile verificado"
+      - run:
+          name: Verificar docker-compose.yml
+          command: |
+            echo "=== Verificando docker-compose.yml ==="
+            cat docker-compose.yml
+            grep -q "web" docker-compose.yml && echo "  v Servicio web definido" || exit 1
+            grep -q "db" docker-compose.yml && echo "  v Servicio db definido" || exit 1
+            grep -q "ganandez-net" docker-compose.yml && echo "  v Red ganandez-net definida" || echo "  ! Red no encontrada"
+            echo "v docker-compose.yml verificado"
+
+workflows:
+  pipeline-ganaderia-livestock:
+    jobs:
+      - validar-php
+      - verificar-estructura:
+          requires:
+            - validar-php
+      - verificar-docker:
+          requires:
+            - verificar-estructura
